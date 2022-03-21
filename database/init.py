@@ -26,6 +26,7 @@ def init():
                  "uploader bool default false not null, "
                  "created_at timestamp default now() not null, "
                  "updated_at timestamp default now() not null, "
+                 "last_login timestamp default now() not null, "
                  "constraint users_pk "
                  "primary key (id) "
                  "); "))
@@ -47,7 +48,7 @@ def init():
                  "on update cascade on delete cascade, "
                  "ip text not null, "
                  "ua text not null, "
-                 "type text not null, "
+                 "type text, "
                  "started_at timestamp default now() not null, "
                  "expires_at timestamp default now() + interval '1' month not null, "
                  "last_activity timestamp default now() not null "

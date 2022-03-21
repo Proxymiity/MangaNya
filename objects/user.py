@@ -18,6 +18,7 @@ class User:
         self.uploader = bool(False)
         self.created_at = datetime
         self.updated_at = datetime
+        self.last_login = datetime
         if args:
             _items = [x[0] for x in list(self.__dict__.items())]
             for i in range(len(args)):

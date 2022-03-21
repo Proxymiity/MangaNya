@@ -2,6 +2,7 @@ from database.connector import db, dbc
 
 
 def create(token, user, ip, ua, _type):
+    dbc.execute("update users set last_login = now() where id = %s", (user,))
     dbc.execute("insert into sessions (token, user_id, ip, ua, type) "
                 "values (%s, %s, %s, %s, %s) returning *",
                 (token, user, ip, ua, _type))
