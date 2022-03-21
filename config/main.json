@@ -1,0 +1,5 @@
+{
+  "uwsgi": false,
+  "env": "dev",
+  "domain": "manga.nya.network"
+}
