@@ -83,7 +83,7 @@ def _validate_password(password):
         raise exceptions.FieldValidationError
 
 
-def login(username, password):
+def login(ctx, username, password):
     _validate_username(username)
     _validate_password(password)
     user = User.from_username(username)
@@ -91,14 +91,20 @@ def login(username, password):
         raise exceptions.InvalidUsernameError
     if not user.check_pw(password):
         raise exceptions.InvalidPasswordError
-    return Session.create(user, request.remote_addr, request.headers.get("User-Agent", "?"))
+    ctx.session = Session.create(user, request.remote_addr, request.headers.get("User-Agent", "?"))
+    ctx.user = User.from_id(ctx.session.user)
+    ctx.token = ctx.session.token
 
 
 def logout(ctx):
-    ctx.session.delete()
+    if ctx.session:
+        ctx.session.delete()
+    ctx.session = None
+    ctx.user = None
+    ctx.token = None
 
 
-def register(username, email, password):
+def register(ctx, username, email, password):
     _validate_username(username)
     _validate_email(email)
     _validate_password(password)
@@ -113,4 +119,6 @@ def register(username, email, password):
     user.email = email
     user.set_pw(password)
     user.create()
-    return Session.create(user, request.remote_addr, request.headers.get("User-Agent", "?"))
+    ctx.session = Session.create(user, request.remote_addr, request.headers.get("User-Agent", "?"))
+    ctx.user = User.from_id(ctx.session.user)
+    ctx.token = ctx.session.token
