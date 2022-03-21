@@ -41,9 +41,9 @@ class Context:
         r = make_response(response)
         r.status = status
         if set_cookies:
-            if self.token and not self.session:
+            if _extract_token() and not self.session:
                 r.delete_cookie("auth_token", secure=True, samesite="strict")
-            if not self.token and self.session:
+            if not _extract_token() and self.session:
                 r.set_cookie("auth_token", self.session.token, secure=True, samesite="strict")
         return r
 
