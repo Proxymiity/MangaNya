@@ -2,7 +2,9 @@ import exceptions
 from flask import request, make_response
 from objects import User, Session
 from json import dumps
+import re
 SPACE = " "
+EMAIL_REGEX = re.compile(r"[^@]+@[^@]+\.[^@]+")
 
 
 def _extract_token():
@@ -52,6 +54,24 @@ class Context:
         return r
 
 
+def _validate_username(username):
+    if not 4 <= len(username) <= 32:
+        raise exceptions.FieldValidationError
+    if SPACE in username:
+        raise exceptions.FieldValidationError
+    if not all([x.isalnum() or x == '_' for x in username]):
+        raise exceptions.FieldValidationError
+
+
+def _validate_email(email):
+    if not 5 <= len(email) <= 128:
+        raise exceptions.FieldValidationError
+    if SPACE in email:
+        raise exceptions.FieldValidationError
+    if not re.fullmatch(EMAIL_REGEX, email):
+        raise exceptions.FieldValidationError
+
+
 def _validate_password(password):
     if not 8 <= len(password) <= 64:
         raise exceptions.FieldValidationError
@@ -64,6 +84,7 @@ def _validate_password(password):
 
 
 def login(username, password):
+    _validate_username(username)
     _validate_password(password)
     user = User.from_username(username)
     if not user:
@@ -78,6 +99,8 @@ def logout(ctx):
 
 
 def register(username, email, password):
+    _validate_username(username)
+    _validate_email(email)
     _validate_password(password)
     ut1 = User.from_username(username)
     ut2 = User.from_email(email)
