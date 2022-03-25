@@ -2,7 +2,8 @@ from database.connector import db, dbc
 
 
 def create(token, user, ip, ua, _type):
-    dbc.execute("update users set last_login = now() where id = %s", (user,))
+    dbc.execute("update users set last_login = (now() at time zone 'utc') "
+                "where id = %s", (user,))
     dbc.execute("insert into sessions (token, user_id, ip, ua, type) "
                 "values (%s, %s, %s, %s, %s) returning *",
                 (token, user, ip, ua, _type))
@@ -20,7 +21,8 @@ def delete(token):
 
 def extend(token, ip, ua):
     dbc.execute("update sessions set ip = %s, ua = %s, "
-                "expires_at = now() + interval '1' month, last_activity = now() "
+                "expires_at = (now() at time zone 'utc') + interval '1' month, "
+                "last_activity = (now() at time zone 'utc') "
                 "where token = %s ",
                 (ip, ua, token))
     db.commit()

@@ -24,9 +24,9 @@ def init():
                  "state int default 0 not null, "
                  "admin bool default false not null, "
                  "uploader bool default false not null, "
-                 "created_at timestamp default now() not null, "
-                 "updated_at timestamp default now() not null, "
-                 "last_login timestamp default now() not null, "
+                 "created_at timestamp default (now() at time zone 'utc') not null, "
+                 "updated_at timestamp default (now() at time zone 'utc') not null, "
+                 "last_login timestamp default (now() at time zone 'utc') not null, "
                  "constraint users_pk "
                  "primary key (id) "
                  "); "))
@@ -49,9 +49,9 @@ def init():
                  "ip text not null, "
                  "ua text not null, "
                  "type text, "
-                 "started_at timestamp default now() not null, "
-                 "expires_at timestamp default now() + interval '1' month not null, "
-                 "last_activity timestamp default now() not null "
+                 "started_at timestamp default (now() at time zone 'utc') not null, "
+                 "expires_at timestamp default (now() at time zone 'utc') + interval '1' month not null, "
+                 "last_activity timestamp default (now() at time zone 'utc') not null "
                  "); "))
 
     dbc.execute(("create table manga "
@@ -67,8 +67,8 @@ def init():
                  "title text, "
                  "language text not null, "
                  "cover text not null, "
-                 "created_at timestamp default now() not null, "
-                 "updated_at timestamp default now() not null "
+                 "created_at timestamp default (now() at time zone 'utc') not null, "
+                 "updated_at timestamp default (now() at time zone 'utc') not null "
                  "); "))
 
     dbc.execute(("create table mg_meta_artists "

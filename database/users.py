@@ -19,7 +19,7 @@ def delete(id_):
 
 def update(id_, username, password, email, state, admin, uploader):
     dbc.execute("update users set username = %s, password = %s, email = %s, state = %s, "
-                "admin = %s, uploader = %s, updated_at = now() "
+                "admin = %s, uploader = %s, updated_at = (now() at time zone 'utc') "
                 "where id = %s",
                 (username, password, email, state, admin, uploader, id_))
     db.commit()

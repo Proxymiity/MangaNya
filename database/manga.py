@@ -19,7 +19,7 @@ def delete(id_):
 
 def update(id_, state, type_, uploader, title, language):
     dbc.execute("update manga set state = %s, type = %s, uploader = %s, "
-                "title = %s, language = %s, updated_at = now() "
+                "title = %s, language = %s, updated_at = (now() at time zone 'utc') "
                 "where id = %s",
                 (state, type_, uploader, title, language, id_))
     db.commit()
