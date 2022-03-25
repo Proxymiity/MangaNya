@@ -15,12 +15,13 @@ def init():
     dbc.execute("drop table if exists sessions;")
     dbc.execute("drop table if exists users;")
 
+    dbc.execute("create extension if not exists CITEXT;")
     dbc.execute(("create table users "
                  "( "
                  "id serial, "
-                 "username text not null, "
+                 "username citext not null, "
                  "password text not null, "
-                 "email text not null, "
+                 "email citext not null, "
                  "state int default 0 not null, "
                  "admin bool default false not null, "
                  "uploader bool default false not null, "
