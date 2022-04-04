@@ -2,6 +2,7 @@ import exceptions
 from flask import request, make_response
 from objects import User, Session
 from json import dumps
+from datetime import datetime
 import re
 SPACE = " "
 EMAIL_REGEX = re.compile(r"[^@]+@[^@]+\.[^@]+")
@@ -29,6 +30,9 @@ class Context:
         if tk:
             self.token = tk
             sess = Session.from_token(tk)
+            if sess:
+                if datetime.utcnow() >= sess.expires_at or 0:
+                    sess = None
             if sess:
                 user = User.from_id(sess.user)
                 if user:
