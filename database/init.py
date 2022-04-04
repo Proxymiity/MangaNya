@@ -22,6 +22,7 @@ def init():
                  "username citext not null, "
                  "password text not null, "
                  "email citext not null, "
+                 "private bool default false not null, "
                  "state int default 0 not null, "
                  "admin bool default false not null, "
                  "uploader bool default false not null, "
@@ -167,6 +168,7 @@ def dummy():
     u.username = "test_user"
     u.set_pw("testPasswordForTestUser")
     u.email = "test@nya.network"
+    u.private = True
     u.admin = True
     u.create()
     m = Manga()
