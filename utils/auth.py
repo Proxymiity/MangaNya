@@ -41,9 +41,10 @@ class Context:
                     if extend:
                         sess.extend(request.remote_addr, request.headers.get("User-Agent", "?"))
 
-    def reply(self, response, status=200, set_cookies=True):
+    def reply(self, response, status=None, set_cookies=True):
         r = make_response(response)
-        r.status = status
+        if status:
+            r.status = status
         if set_cookies:
             if _extract_token() and not self.session:
                 r.delete_cookie("auth_token", secure=True, samesite="strict")
