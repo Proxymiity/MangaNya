@@ -6,6 +6,9 @@ from datetime import datetime
 import re
 SPACE = " "
 EMAIL_REGEX = re.compile(r"[^@]+@[^@]+\.[^@]+")
+STATES = ["UNVERIFIED", "ACTIVE", "BANNED", "WAITING_DELETION", "DELETED", "RESTRICTED"]
+_states_names = {i: STATES[i] for i in range(len(STATES))}
+_states_ids = {STATES[i]: i for i in range(len(STATES))}
 
 
 def _extract_token():
@@ -127,3 +130,32 @@ def register(ctx, username, email, password):
     ctx.session = Session.create(user, request.remote_addr, request.headers.get("User-Agent", "?"))
     ctx.user = User.from_id(ctx.session.user)
     ctx.token = ctx.session.token
+
+
+def edit_user(ctx, new_username=None, new_email=None, new_password=None):
+    if new_username:
+        _validate_username(new_username)
+        user_by_name = User.from_username(new_username)
+        if user_by_name:
+            if user_by_name.username.lower() != ctx.user.username.lower():
+                raise exceptions.UsernameUsedError
+        ctx.user.username = new_username
+    if new_email:
+        _validate_email(new_email)
+        user_by_mail = User.from_email(new_username)
+        if user_by_mail:
+            if user_by_mail.email.lower() != ctx.user.email.lower():
+                raise exceptions.EmailUsedError
+        ctx.user.email = new_email
+    if new_password:
+        _validate_password(new_password)
+        ctx.user.set_pw(new_password)
+    ctx.user.update()
+
+
+def state_id(name):
+    return _states_ids.get(name)
+
+
+def state_name(id_):
+    return _states_names.get(id_)
