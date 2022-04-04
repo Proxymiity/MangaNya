@@ -97,7 +97,7 @@ def login(ctx, username, password):
     if not user.check_pw(password):
         raise exceptions.InvalidPasswordError
     ctx.session = Session.create(user, request.remote_addr, request.headers.get("User-Agent", "?"))
-    ctx.user = User.from_id(ctx.session.user)
+    ctx.user = user
     ctx.token = ctx.session.token
 
 
