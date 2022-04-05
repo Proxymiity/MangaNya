@@ -24,9 +24,9 @@ class Session:
             self.__dict__.update(kwargs)
 
     @classmethod
-    def create(cls, user, ip, ua, _type=None):
+    def create(cls, user, ip, ua, type_=None):
         tk = token_urlsafe(32)
-        x = sessions.create(tk, user.id, ip, ua, _type)
+        x = sessions.create(tk, user.id, ip, ua, type_)
         return cls(*x)
 
     def delete(self):
@@ -35,6 +35,13 @@ class Session:
             raise exceptions.EntryNotFoundError
         sessions.delete(self.token)
         self.token = str()
+
+    def update(self):
+        validation.validate_model(self, req_prop)
+        if not self.token:
+            raise exceptions.EntryNotFoundError
+        sessions.update(self.token,
+                        self.user, self.ip, self.ua, self.type, self.started_at, self.expires_at, self.last_activity)
 
     def extend(self, ip=None, ua=None):
         validation.validate_model(self, req_prop)

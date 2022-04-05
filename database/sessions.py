@@ -1,12 +1,12 @@
 from database.connector import db, dbc
 
 
-def create(token, user, ip, ua, _type):
+def create(token, user, ip, ua, type_):
     dbc.execute("update users set last_login = (now() at time zone 'utc') "
                 "where id = %s", (user,))
     dbc.execute("insert into sessions (token, user_id, ip, ua, type) "
                 "values (%s, %s, %s, %s, %s) returning *",
-                (token, user, ip, ua, _type))
+                (token, user, ip, ua, type_))
     db.commit()
     w = dbc.fetchall()[0]
     print(f"I:[database/sessions] Created {w[0]}:{user}")
@@ -17,6 +17,15 @@ def delete(token):
     dbc.execute("delete from sessions where token = %s", (token,))
     db.commit()
     print(f"I:[database/sessions] Deleted {token}")
+
+
+def update(token, user, ip, ua, type_, started_at, expires_at, last_activity):
+    dbc.execute("update sessions set user_id = %s, ip = %s, ua = %s, type = %s, "
+                "started_at = %s, expires_at = %s, last_activity = %s "
+                "where token = %s",
+                (user, ip, ua, type_, started_at, expires_at, last_activity, token))
+    db.commit()
+    print(f"I:[database/sessions] Updated {token}")
 
 
 def extend(token, ip, ua):
