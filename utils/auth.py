@@ -100,7 +100,9 @@ def login(ctx, username, password):
     if not user:
         raise exceptions.InvalidUsernameError
     if not user.check_pw(password):
-        raise exceptions.InvalidPasswordError
+        raise exceptions.InvalidPasswordError(user=user)
+    if user.state not in (state_id("UNVERIFIED"), state_id("ACTIVE"), state_id("RESTRICTED")):
+        raise exceptions.UserStateError(user=user)
     ctx.session = Session.create(user, request.remote_addr, request.headers.get("User-Agent", "?"))
     ctx.user = user
     ctx.token = ctx.session.token
@@ -121,9 +123,9 @@ def register(ctx, username, email, password):
     ut1 = User.from_username(username)
     ut2 = User.from_email(email)
     if ut1:
-        raise exceptions.UsernameUsedError
+        raise exceptions.UsernameUsedError(user=ut1)
     if ut2:
-        raise exceptions.EmailUsedError
+        raise exceptions.EmailUsedError(user=ut2)
     user = User()
     user.username = username
     user.email = email
@@ -140,14 +142,14 @@ def edit_user(ctx, new_username=None, new_email=None, new_password=None):
         user_by_name = User.from_username(new_username)
         if user_by_name:
             if user_by_name.username.lower() != ctx.user.username.lower():
-                raise exceptions.UsernameUsedError
+                raise exceptions.UsernameUsedError(user=user_by_name)
         ctx.user.username = new_username
     if new_email:
         _validate_email(new_email)
         user_by_mail = User.from_email(new_username)
         if user_by_mail:
             if user_by_mail.email.lower() != ctx.user.email.lower():
-                raise exceptions.EmailUsedError
+                raise exceptions.EmailUsedError(user=user_by_mail)
         ctx.user.email = new_email
     if new_password:
         _validate_password(new_password)

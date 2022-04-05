@@ -23,7 +23,8 @@ class EntryExistsError(DBException):
 
 
 class AuthException(MNException):
-    pass
+    def __init__(self, **kwargs):
+        self.user = kwargs.pop('user', None)
 
 
 class InvalidUsernameError(AuthException):
@@ -43,4 +44,8 @@ class EmailUsedError(AuthException):
 
 
 class FieldValidationError(AuthException):
+    pass
+
+
+class UserStateError(AuthException):
     pass
