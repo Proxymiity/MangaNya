@@ -1,4 +1,5 @@
 import psycopg2
+
 from utils import conf
 from pxyTools import dataIO
 # Commented for compatibility with Windows envs during early development.

@@ -1,8 +1,10 @@
-import exceptions
 import bcrypt
-from database import users
 from datetime import datetime
+
+from database import users
 from utils import validation, conf
+import exceptions
+
 SALT = conf.get("auth", "salt").encode("utf-8")
 req_prop = ("username", "password", "email")
 

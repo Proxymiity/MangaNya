@@ -1,9 +1,11 @@
-import exceptions
 from flask import request, make_response
-from objects import User, Session
-from json import dumps
 from datetime import datetime
+from json import dumps
 import re
+
+from objects import User, Session
+import exceptions
+
 SPACE = " "
 EMAIL_REGEX = re.compile(r"[^@]+@[^@]+\.[^@]+")
 STATES = ["UNVERIFIED", "ACTIVE", "BANNED", "WAITING_DELETION", "DELETED", "RESTRICTED"]

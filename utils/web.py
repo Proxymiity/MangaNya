@@ -11,9 +11,10 @@ def time_str(dt):
 
 
 def time_ago(dt):
-    delta = datetime.utcnow() - dt
-    if not delta.seconds:
-        return "now"
+    now = datetime.utcnow()
+    if now <= dt:
+        return "now"  # Prevents a database time drift from messing up frontend
+    delta = now - dt
     m, s = divmod(delta.seconds, 60)
     h, m = divmod(m, 60)
     d, h = divmod(h, 24)

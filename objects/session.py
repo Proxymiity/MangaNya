@@ -1,8 +1,10 @@
-import exceptions
-from database import sessions
-from datetime import datetime
-from utils import validation
 from secrets import token_urlsafe
+from datetime import datetime
+
+from database import sessions
+from utils import validation
+import exceptions
+
 req_prop = ("token", "user", "ip", "ua")
 
 

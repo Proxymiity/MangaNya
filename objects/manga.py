@@ -1,7 +1,9 @@
-import exceptions
-from database import manga
 from datetime import datetime
+
+from database import manga
 from utils import validation
+import exceptions
+
 req_prop = ("type", "uploader", "title", "language", "cover")
 
 
