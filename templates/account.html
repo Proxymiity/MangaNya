@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+
+{% block title %}Account{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h1>Account Management</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div>
+                    <h2>User Info</h2>
+                    <ul>
+                        <li>Username:&nbsp;<code>{{ ctx.user.username }}</code></li>
+                        <li>Email:&nbsp;<code>{{ ctx.user.email }}</code></li>
+                        <li>Visibility: {{ visibility }}</li>
+                        <li>State: {{ state }} (<code>{{ ctx.user.state }}</code>)</li>
+                    </ul>
+                </div><div>
+                <h2>Privileges</h2>
+                <ul>
+                    {% if perms %}
+                        {% for perm in perms %}
+                            <li>{{ perm }}</li>
+                        {% endfor %}
+                    {% else %}
+                        <li><i>None</i></li>
+                    {% endif %}
+                </ul>
+            </div>
+                <div>
+                    <h2>History</h2>
+                    <ul>
+                        <li>Created at:&nbsp;<code>{{ history.created_at }}</code></li>
+                        <li>Updated at:&nbsp;<code>{{ history.updated_at }}</code></li>
+                        <li>Last login at:&nbsp;<code>{{ history.last_login }}</code></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <h2>Edit Account</h2>
+                <p>Leave fields blank to remain unchanged.</p>
+                <form method="post"><input class="form-control" type="text" name="username" placeholder="New Username" autofocus="" minlength="4" maxlength="32" pattern="^[a-zA-Z0-9_]*$">
+                    <p>No spaces/special chars. Between 4-32 chars.&nbsp;<code>A-Z, a-z, 0-9, _</code><br></p><input class="form-control" type="email" style="margin-top: 8px;" name="email" placeholder="New Email" pattern="[^@]+@[^@]+\.[^@]+" minlength="5" maxlength="128">
+                    <p>Used for recovery. Max 128 chars.&nbsp;<code>&lt;user&gt;@&lt;domain&gt;.&lt;tld&gt;</code><br></p><input class="form-control" type="password" name="password" placeholder="New Password" style="margin-top: 8px;" minlength="8" maxlength="64">
+                    <p>Between 8-64 chars. Editing does not terminate active sessions.<br></p><input class="form-control" type="password" name="actual_password" placeholder="Old Password" style="margin-top: 8px;" minlength="8" maxlength="64" required=""><button class="btn btn-primary d-block w-100" type="submit" style="margin-top: 8px;">Edit</button>
+                </form>
+                <hr>
+                <div class="row">
+                    <div class="col"><button class="btn btn-secondary d-block w-100" type="button" style="margin-top: 8px;" data-bs-target="#modal-visibility" data-bs-toggle="modal">Change profile visibility</button></div>
+                    <div class="col"><button class="btn btn-success d-block w-100" type="button" style="margin-top: 8px;" data-bs-target="#modal-apikey" data-bs-toggle="modal">Create API Key</button></div>
+                </div>
+                <div class="row">
+                    <div class="col"><button class="btn btn-warning d-block w-100" type="button" style="margin-top: 8px;" data-bs-target="#modal-logout" data-bs-toggle="modal">Logout from all devices</button></div>
+                    <div class="col"><button class="btn btn-danger d-block w-100" type="button" style="margin-top: 8px;" data-bs-target="#modal-delete" data-bs-toggle="modal">Delete account</button></div>
+                </div>
+                <div class="modal fade" role="dialog" tabindex="-1" id="modal-visibility">
+                    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title">Change profile visibility</h4><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>There are two visibility modes for your profile:</p>
+                                <ul>
+                                    <li><strong>Public</strong>&nbsp;(default) — Other users can view your favorites.</li>
+                                    <li><strong>Private</strong>&nbsp;— Only you can view your favorites.</li>
+                                </ul>
+                                <p>Your profile is currently set to <strong>{{ visibility }}</strong>.<br>You can change back at any time.</p>
+                            </div>
+                            <div class="modal-footer"><button class="btn btn-light" type="button" data-bs-dismiss="modal">Cancel</button>
+                                <form method="post" action="/account/profile_visibility"><select class="form-select" name="mode" required="">
+                                    <optgroup label="Profile Visibility">
+                                        <option value="public" selected="">Public</option>
+                                        <option value="private">Private</option>
+                                    </optgroup>
+                                </select><button class="btn btn-secondary d-block w-100" type="submit">Change profile visibility</button></form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal fade" role="dialog" tabindex="-1" id="modal-apikey">
+                    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title">Create API Key</h4><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>This option is intended for developers only. You will only be able to view the key once.<br>An API key is managed the same way as a regular device. This means that you cannot revoke it unless you logout all devices. <br>There are two types of API key:</p>
+                                <ul>
+                                    <li><strong>Trackable</strong>&nbsp;(recommended) — This type of key works exactly like a device. It will expire after 30 days of inactivity, but you can track its last activity.</li>
+                                    <li><strong>Permanent</strong>&nbsp;— This type of key works exactly like a device. It won't expire, but you can't track its last activity. You must be an Uploader to create a permanent key.</li>
+                                </ul>
+                                <p>An API Key allows you to do the following:</p>
+                                <ul>
+                                    <li><strong>Get</strong>&nbsp;media details (title, tags, type, etc.)</li>
+                                    <li><strong>Get</strong>&nbsp;user details (name, favorites)</li>
+                                    <li><strong>Post</strong>&nbsp;new media&nbsp;<em>(uploaders only)</em></li>
+                                    <li><strong>Patch</strong>&nbsp;media&nbsp;<em>(uploaders only)</em></li>
+                                </ul>
+                                <p>While you can use an API token on the website, you cannot use a regular auth token on the API.<br>Please note that any misuse of the API may result in your account being banned.<br></p>
+                            </div>
+                            <div class="modal-footer"><button class="btn btn-light" type="button" data-bs-dismiss="modal">Cancel</button>
+                                <form method="post" action="/account/api_key"><select class="form-select" name="type" required="">
+                                    <optgroup label="Key Type">
+                                        <option value="trackable" selected="">Trackable</option>
+                                        <option value="permanent">Permanent</option>
+                                    </optgroup>
+                                </select><button class="btn btn-success d-block w-100" type="submit">Create API Key</button></form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal fade" role="dialog" tabindex="-1" id="modal-logout">
+                    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title">Logout from all devices</h4><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>This will remove all devices from your account.<br>Devices will require you to re-log in order to access your account again.<br>API Keys you may have created will instantly be invalidated.</p>
+                            </div>
+                            <div class="modal-footer"><button class="btn btn-light" type="button" data-bs-dismiss="modal">Cancel</button>
+                                <form method="post" action="/account/clear_sessions"><button class="btn btn-warning d-block w-100" type="submit">Logout from all devices</button></form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal fade" role="dialog" tabindex="-1" id="modal-delete">
+                    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title">Delete account</h4><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>This will instantly log you out of your account without a way to log back in.<br>Please take note of the following:<br></p>
+                                <ul>
+                                    <li>You won't be able to register using the same username and email for the next couple hours while our system processes your request.</li>
+                                    <li>Your username will be anonymized. It'll look something like&nbsp;<code><br>98b6950a-9546-4a60-b808-343a83985a65<br></code></li>
+                                    <li>All of your uploads will stay online and you won't be able to edit them anymore.</li>
+                                </ul>
+                            </div>
+                            <div class="modal-footer"><button class="btn btn-light" type="button" data-bs-dismiss="modal">Cancel</button>
+                                <form method="post" action="/account/delete_account"><input class="form-control" type="password" name="password" placeholder="Password" required="" minlength="8" maxlength="64"><button class="btn btn-danger d-block w-100" type="submit">Delete account</button></form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <h2>Devices</h2>                <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Type</th>
+                        <th>IP Address</th>
+                        <th>Device</th>
+                        <th>Logged in at</th>
+                        <th>Last activity</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for row in devices %}
+                        <tr>
+                            <td>{{ row[0] }}</td>
+                            <td>{{ row[1] }}</td>
+                            <td>{{ row[2] }}</td>
+                            <td>{{ row[3] }}</td>
+                            <td>{{ row[4] }}</td>
+                            <td>{{ row[5] }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

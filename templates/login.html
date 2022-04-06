@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 col-xl-6 offset-xl-3">
+                <h1>Log in</h1>
+                <form method="post"><input class="form-control" type="text" name="username" placeholder="Username" autofocus="" minlength="4" maxlength="32" pattern="^[a-zA-Z0-9_]*$" required=""><input class="form-control" type="password" name="password" placeholder="Password" style="margin-top: 8px;" required="" minlength="8" maxlength="64"><button class="btn btn-primary d-block w-100" type="submit" style="margin-top: 8px;">Log In</button>
+                    <p style="margin-bottom: 0px;"><a class="forgot" href="/forgot" style="margin-bottom: 0px;"><i class="fa fa-lock"></i>&nbsp;Forgot your login info?</a></p>
+                    <p style="margin-bottom: 0px;"><a class="forgot" href="/register"><i class="fa fa-plus"></i>&nbsp;Register</a></p>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
