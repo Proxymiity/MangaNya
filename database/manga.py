@@ -94,3 +94,29 @@ def remove_association(id_):
     dbc.execute("delete from mg_associations where id = %s", (id_,))
     db.commit()
     print(f"I:[database/manga] Removed {id_} association")
+
+
+def list_types():
+    dbc.execute("select distinct type from manga")
+    m = dbc.fetchall()
+    return [x[0] for x in m]
+
+
+def get_latest(states, offset=0, limit=50, type_=None):
+    if type_:
+        dbc.execute("select * from manga where type = %s and state in %s "
+                    "order by id desc limit %s offset %s", (type_, states, limit, offset))
+    else:
+        dbc.execute("select * from manga where state in %s "
+                    "order by id desc limit %s offset %s", (states, limit, offset))
+    m = dbc.fetchall()
+    return m
+
+
+def count_latest(states, type_=None):
+    if type_:
+        dbc.execute("select count(id) from manga where type = %s and state in %s", (type_, states))
+    else:
+        dbc.execute("select count(id) from manga where state in %s", (states,))
+    m = dbc.fetchall()[0][0]
+    return m
