@@ -4,12 +4,13 @@ from utils.auth import Context
 from utils.web import mflash
 from utils import conf
 
-from views import account, home
+from views import account, home,  manga
 
 app = Flask(__name__)
 app.secret_key = conf.get("auth", "secret_key")
 app.register_blueprint(account)
 app.register_blueprint(home)
+app.register_blueprint(manga)
 
 
 if conf.get("main", "env", "prod") == "prod":

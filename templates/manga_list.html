@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h1>{{ list_title }}</h1>            <div>
+                <ul class="nav nav-tabs" role="tablist" style="margin-bottom: 8px;">
+                    {% for category in manga_categories %}
+                        <li class="nav-item" role="presentation"><a class="nav-link {{ 'active' if category.active else '' }}" role="tab" href="/manga/browse/{{ category.name }}">{{ category.display_name }}</a></li>
+                    {% endfor %}
+                </ul>
+                <div class="tab-content">
+                    {% for category in manga_categories %}
+                        <div id="{{ category.name }}" class="tab-pane {{ 'active' if category.active else '' }}" role="tabpanel">
+                            <div class="row">
+                                {% for item in category['items'] %}
+                                    <div class="col-xl-3" style="margin-bottom: 8px;">
+                                        <a href="/m/{{ item.id }}" style="text-decoration: none; color: inherit;">
+                                            <img class="img-fluid" src="{{ item.cover }}" />
+                                            <h4 style="margin-bottom: 0px;">{{ item.title }}</h4>
+                                            <p>{{ item.id }} | {{ item.language }}</p>
+                                        </a>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            </div>
+            <div class="col"><nav>
+                <ul class="pagination">
+                    {% for page, path, class in pagination %}
+                        <li class="page-item {{ class }}"><a class="page-link" href="{{ path }}">{{ page }}</a></li>
+                    {% endfor %}
+                </ul>
+            </nav></div>
+        </div>
+    </div>
+{% endblock %}
