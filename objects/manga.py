@@ -4,6 +4,9 @@ from database import manga
 from utils import validation
 import exceptions
 
+STATES = ["DEFAULT", "READONLY", "EDITING", "UNAVAILABLE", "DELETED", "HIDDEN"]
+_states_names = {i: STATES[i] for i in range(len(STATES))}
+_states_ids = {STATES[i]: i for i in range(len(STATES))}
 req_prop = ("type", "uploader", "title", "language", "cover")
 
 
@@ -97,3 +100,36 @@ class Manga:
             z = x[0] + (x[1], x[2], x[3], x[4], x[5]) + x[6]
             return cls(*z)
         return None
+
+    @classmethod
+    def latest(cls, states=(0, 1, 2), offset=0, limit=50, type_=None):
+        x = manga.get_latest(states, offset, limit, type_)
+        return [cls(*z) for z in x]
+
+    @classmethod
+    def count(cls, states=(0, 1, 2), type_=None):
+        return manga.count_latest(states, type_)
+
+
+class MangaType:
+    def __init__(self, name):
+        self.name = name
+        self.display_name = name.capitalize()
+
+    def latest(self, states=(0, 1, 2), offset=0, limit=50):
+        return Manga.latest(states, offset, limit, self.name)
+
+    def count(self, states=(0, 1, 2)):
+        return Manga.count(states, self.name)
+
+    @classmethod
+    def all(cls):
+        return [cls(x) for x in manga.list_types()]
+
+
+def state_id(name):
+    return _states_ids.get(name)
+
+
+def state_name(id_):
+    return _states_names.get(id_)
