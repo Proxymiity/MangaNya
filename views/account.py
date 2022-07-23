@@ -17,7 +17,7 @@ def login():
     ctx = Context()
     if ctx.session:
         mflash("You're already logged in.", "warning")
-        return ctx.reply(redirect(url_for("index")))
+        return ctx.reply(redirect(url_for("home.index")))
     if request.method == "GET":
         return ctx.reply(render_template("login.html", ctx=ctx))
     req_user = request.form.get("username")
@@ -28,7 +28,7 @@ def login():
     try:
         auth.login(ctx, req_user.strip(), req_pass.strip())
         mflash("<b>Successfully logged in.</b> Welcome back!", "success")
-        return ctx.reply(redirect(url_for("index")))
+        return ctx.reply(redirect(url_for("home.index")))
     except (FieldValidationError, InvalidUsernameError, InvalidPasswordError):
         mflash("<b>Invalid username or password.</b> Please check your credentials and try again.", "danger")
         return ctx.reply(render_template("login.html", ctx=ctx))
@@ -47,7 +47,7 @@ def logout():
     ctx = Context(extend=False)
     auth.logout(ctx)
     mflash("<b>Successfully logged out.</b> See you later!", "success")
-    return ctx.reply(redirect(url_for("index")))
+    return ctx.reply(redirect(url_for("home.index")))
 
 
 @bp.route("/register", methods=["GET", "POST"])
@@ -55,7 +55,7 @@ def register():
     ctx = Context()
     if ctx.session:
         mflash("You're already logged in.", "warning")
-        return ctx.reply(redirect(url_for("index")))
+        return ctx.reply(redirect(url_for("home.index")))
 
     if request.method == "GET":
         return ctx.reply(render_template("register.html", ctx=ctx))
@@ -72,7 +72,7 @@ def register():
     try:
         auth.register(ctx, req_user.strip(), req_email.strip(), req_pass.strip())
         mflash("<b>Successfully registered.</b> Welcome to MangaNya!", "success")
-        return ctx.reply(redirect(url_for("index")))
+        return ctx.reply(redirect(url_for("home.index")))
     except FieldValidationError:
         mflash("<b>Error validating fields.</b> Please check that you correctly filled the form.", "danger")
         return ctx.reply(render_template("register.html", ctx=ctx), status=400)
@@ -214,7 +214,7 @@ def clear_sessions():
 
     mflash("<b>Successfully logged out all devices.</b> Please note that any API key you may have created have "
            "been revoked.", "success")
-    return ctx.reply(redirect(url_for("index")))
+    return ctx.reply(redirect(url_for("home.index")))
 
 
 @bp.route("/account/delete_account", methods=["POST"])
@@ -238,7 +238,7 @@ def delete_account():
 
     mflash("<b>Successfully deleted account.</b> Please note that for security reasons, you won't be able to "
            "create a new account with the same username or email for a couple hours.", "success")
-    return ctx.reply(redirect(url_for("index")))
+    return ctx.reply(redirect(url_for("home.index")))
 
 
 def _edit_account_deny(ctx):

@@ -4,11 +4,12 @@ from utils.auth import Context
 from utils.web import mflash
 from utils import conf
 
-from views import account
+from views import account, home
 
 app = Flask(__name__)
 app.secret_key = conf.get("auth", "secret_key")
 app.register_blueprint(account)
+app.register_blueprint(home)
 
 
 if conf.get("main", "env", "prod") == "prod":
@@ -22,13 +23,6 @@ if conf.get("main", "env", "prod") == "prod":
         except Exception as exc:
             print(f"Error occurred trying to render error: {exc} {exc.args}")
             return "Internal Server Error", 500
-
-
-# Temporary route to at least get the navbar
-@app.route("/")
-def index():
-    ctx = Context()
-    return ctx.reply(render_template("base.html", ctx=ctx))
 
 
 if __name__ == '__main__':
