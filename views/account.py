@@ -7,7 +7,7 @@ from exceptions import (FieldValidationError, UserStateError,
                         UsernameUsedError, EmailUsedError)
 from utils import auth
 from utils.auth import Context
-from utils.web import mflash, time_str, time_ago
+from utils.web import mflash, time_str, time_ago_past
 
 bp = Blueprint("account", __name__)
 
@@ -100,7 +100,7 @@ def account():
         sessions.sort(key=lambda x: x.token)
         devices = [(i+1, sessions[i].type or "-",
                     sessions[i].ip, sessions[i].ua, time_str(sessions[i].started_at),
-                    time_ago(sessions[i].last_activity)) for i in range(len(sessions))]
+                    time_ago_past(sessions[i].last_activity)) for i in range(len(sessions))]
         # An ugly way to get user's permissions. Since there is not too many, it's fine to do it this way
         perms = []
         perms.append("Administrator") if ctx.user.admin else None

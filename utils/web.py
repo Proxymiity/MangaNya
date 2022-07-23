@@ -1,5 +1,6 @@
 from flask import Markup, flash
 from datetime import datetime
+import timeago
 
 
 def mflash(message, category):
@@ -12,16 +13,11 @@ def time_str(dt):
 
 def time_ago(dt):
     now = datetime.utcnow()
+    return timeago.format(dt, now)
+
+
+def time_ago_past(dt):
+    now = datetime.utcnow()
     if now <= dt:
         return "now"  # Prevents a database time drift from messing up frontend
-    delta = now - dt
-    m, s = divmod(delta.seconds, 60)
-    h, m = divmod(m, 60)
-    d, h = divmod(h, 24)
-    if d or h or m:
-        if d or h:
-            if d:
-                return f"{d}d{h}h ago"
-            return f"{h}h{m}m ago"
-        return f"{m}m{s}s ago"
-    return f"{s}s ago"
+    return timeago.format(dt, now)
