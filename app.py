@@ -4,7 +4,7 @@ from utils.auth import Context
 from utils.web import mflash
 from utils import conf
 
-from views import account, home,  manga
+from views import account, home, manga
 
 app = Flask(__name__)
 app.secret_key = conf.get("auth", "secret_key")
