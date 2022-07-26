@@ -5,3 +5,4 @@ pxyTools>=1.1.5
 bcrypt>=3.2.0
 cryptography>=36.0.2
 timeago>=1.0.15
+requests>=2.28.1

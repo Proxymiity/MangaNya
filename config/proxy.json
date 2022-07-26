@@ -1,0 +1,13 @@
+{
+  "proxies": {
+    "": {
+      "targets": [],
+      "kind": "",
+      "url": "",
+      "token": "",
+      "caching": true,
+      "load_mode": false,
+      "client_side": false
+    }
+  }
+}
