@@ -29,5 +29,5 @@ def browse(category, page=1):
             "active": category == t.name,
             "items": t.latest(offset=offset) if category == t.name else [],
         })
-    return ctx.reply(render_template("manga_list.html", ctx=ctx,
+    return ctx.reply(render_template("manga_list.html", ctx=ctx, title=category.capitalize(),
                                      manga_categories=manga, pagination=pagination))
