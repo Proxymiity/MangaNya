@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ m.title }} - Reader{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 col-lg-6 offset-lg-3 text-center" style="margin-bottom: 4px;"><div class="progress">
+                <div class="progress-bar" aria-valuenow="{{ pb_current }}" aria-valuemin="1" aria-valuemax="{{ pb_total }}" style="width: {{ pb_pct }}%;">{{ pb_current }}/{{ pb_total }}</div>
+            </div></div>
+            <div class="col-md-12 col-lg-12 text-center" style="margin-bottom: 4px;"><a class="btn btn-primary btn-sm" role="button" style="margin-right: 8px;" href="{{ a_prev }}">Prev</a><a class="btn btn-primary btn-sm" role="button" href="{{ a_next }}">Next</a></div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 text-center"><a href="{{ a_next }}"><img class="img-fluid" src="{{ image }}"></a></div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 col-lg-12 text-center" style="margin-top: 4px;"><a class="btn btn-primary btn-sm" role="button" style="margin-right: 8px;" href="{{ a_prev }}">Prev</a><a class="btn btn-primary btn-sm" role="button" href="{{ a_next }}">Next</a></div>
+            <div class="col-md-12 col-lg-12 text-center" style="margin-top: 4px;"><a href="{{ a_back }}" style="margin-right: 8px;"><i class="fas fa-long-arrow-alt-left"></i>&nbsp;Back to manga</a><a href="{{ image }}" target="_blank"><i class="fas fa-search-plus"></i>&nbsp;Open image in new tab</a></div>
+            <div class="col-md-12 col-lg-12 text-center" style="margin-top: 4px;"><a href="{{ s_url }}" style="margin-right: 8px;"><i class="fas fa-server"></i>&nbsp;Not loading? Switch to {{ s_text }}</a></div>
+        </div>
+    </div>
+{% endblock %}

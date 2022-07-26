@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ m.title }} - Reader{% endblock %}
+
+{% block content %}
+    <div class="container"><div class="row">
+        {% for image in images %}
+            <div class="col-md-12 text-center"><img class="img-fluid" src="{{ image }}" /></div>
+        {% endfor %}
+    </div>
+        <div class="row">
+            <div class="col-md-12 col-lg-12 text-center" style="margin-top: 4px;"><a href="{{ a_back }}" style="margin-right: 8px;"><i class="fas fa-long-arrow-alt-left"></i>&nbsp;Back to manga</a><a target="_blank" data-bs-target="#image-modal" data-bs-toggle="modal" href="#image-modal"><i class="fas fa-search-plus"></i>&nbsp;Open images in new tab</a></div>
+            <div class="col-md-12 col-lg-12 text-center" style="margin-top: 4px;"><a href="{{ s_url }}" style="margin-right: 8px;"><i class="fas fa-server"></i>&nbsp;Not loading? Switch to {{ s_text }}</a></div>
+        </div>
+    </div>
+    <div class="modal fade" role="dialog" tabindex="-1" id="image-modal">
+        <div class="modal-dialog modal-dialog-scrollable" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Open images in new tab</h4><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Click on an image to open it in a new tab</p><div class="container">
+                    <div class="row">
+                        {% for image in images %}
+                            <div class="col-md-6" style="margin-bottom: 24px;"><a href="{{ image }}" target="_blank"><img class="img-fluid" src="{{ image }}" /></a></div>
+                        {% endfor %}
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ m.title }}{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h1 style="margin-bottom: 0px;">{{ m.title }}</h1>
+                <p>{{ m.type|capitalize }} | {{ m.language }} | #{{ m.id }}</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6"><img class="img-fluid" src="{{ m.cover }}"><a href="{{ m.cover }}" target="_blank">
+                <p style="margin-top: 8px;"><i class="fas fa-search-plus"></i>&nbsp;Open cover in new tab</p>
+            </a></div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col">
+                        <h2 style="margin-bottom: 0px;">Details</h2>
+                        <hr style="margin-bottom: 8px;margin-top: 8px;">
+                        <p style="margin-bottom: 8px;">ID: {{ m.id }}</p>
+                        <p style="margin-bottom: 8px;">State: {{ state|capitalize }}</p>
+                        <p style="margin-bottom: 8px;">Type: {{ m.type|capitalize }}</p>
+                        <p style="margin-bottom: 8px;">Title: {{ m.title }}</p>
+                        <p style="margin-bottom: 8px;">Language: {{ m.language }}</p>
+                        <p style="margin-bottom: 8px;">Pages: {{ m.pages|length }}</p>
+                        <hr style="margin-bottom: 8px;margin-top: 8px;"><p style="margin-bottom: 8px;">Artist{{ "s" if m.artists|length > 1 else "" }}: {{ m.artists|join(", ") if m.artists|length > 0 else "Unknown" }}</p><p style="margin-bottom: 8px;">Group{{ "s" if m.groups|length > 1 else "" }}: {{ m.groups|join(", ") if m.groups|length > 0 else "Unknown" }}</p><p style="margin-bottom: 8px;">Sauce{{ "s" if m.sauces|length > 1 else "" }}: {{ m.sauces|join(", ") if m.sauces|length > 0 else "Unknown" }}</p><p style="margin-bottom: 8px;">Tag{{ "s" if m.tags|length > 1 else "" }}: {{ m.tags|join(", ") if m.tags|length > 0 else "Unknown" }}</p>
+                        <hr style="margin-bottom: 8px;margin-top: 8px;">
+                        <p style="margin-bottom: 8px;">Uploader: {{ u.username }}</p>{% if m.source_id is not none %}
+                        <p style="margin-bottom: 8px;">Sourced from: {{ m.source_name }} at {{ d_sourced }}</p>
+                        <p style="margin-bottom: 8px;">Source-specific ID: {{ m.source_id }}</p>
+                    {% endif %}
+                        <hr style="margin-bottom: 8px;margin-top: 8px;">
+                        <p style="margin-bottom: 8px;">Created: {{ d_created }}</p>
+                        <p style="margin-bottom: 8px;">Updated: {{ d_updated }}</p>
+                        <hr style="margin-bottom: 8px;margin-top: 8px;">{% if m.source_id is not none %}
+                        <div class="btn-group"><a class="btn btn-primary" role="button" href="/m/{{ m.id }}/r-s">Read from source</a><button class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false" type="button"></button>
+                            <div class="dropdown-menu">
+                                <h6 class="text-center" style="margin-bottom: 0px;">Readers from source</h6><a class="dropdown-item" href="/m/{{ m.id }}/r-s">Classic reader</a><a class="dropdown-item disabled" href="#"><del>Preloaded reader</del></a><a class="dropdown-item" href="/m/{{ m.id }}/ir-s">InfiniScroll™</a>
+                                <hr style="margin-bottom: 8px;margin-top: 8px;" />
+                                <h6 class="text-center" style="margin-bottom: 0px;">Downloads from source</h6><a class="dropdown-item" href="/m/{{ m.id }}/dl-s/pdf">Download PDF</a><a class="dropdown-item" href="/m/{{ m.id }}/dl-s/zip">Download ZIP archive</a>
+                            </div>
+                        </div>
+                    {% endif %}
+                        <div class="btn-group" style="margin-right: 8px;"><a class="btn btn-primary" role="button" href="/m/{{ m.id }}/r">Read</a><button class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false" type="button"></button>
+                            <div class="dropdown-menu">
+                                <h6 class="text-center" style="margin-bottom: 0px;">Readers</h6><a class="dropdown-item" href="/m/{{ m.id }}/r">Classic reader</a><a class="dropdown-item" href="/m/{{ m.id }}/cr">Preloaded reader</a><a class="dropdown-item" href="/m/{{ m.id }}/ir">InfiniScroll™</a>
+                                <hr style="margin-bottom: 8px;margin-top: 8px;">
+                                <h6 class="text-center" style="margin-bottom: 0px;">Downloads</h6><a class="dropdown-item" href="/m/{{ m.id }}/dl/pdf">Download PDF</a><a class="dropdown-item" href="/m/{{ m.id }}/dl/zip">Download ZIP archive</a>
+                            </div>
+                        </div>{% if m.source_id is not none %}
+                        <p>Reading from source allows your browser to directly fetch images from the website. If available, it is faster than proxy reading. <i>If images aren't loading, try proxy reading.</i></p>
+                    {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

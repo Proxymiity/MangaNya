@@ -1,9 +1,11 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, url_for, redirect
 from math import ceil
 
-from objects import Manga, MangaType
+from objects import Manga, MangaType, User
+from objects.manga import state_name
 from utils.auth import Context
-from utils.web import gen_paginate_data
+from utils.web import gen_paginate_data, mflash
+from utils.proxy import get_url
 
 bp = Blueprint("manga", __name__)
 
@@ -31,3 +33,100 @@ def browse(category, page=1):
         })
     return ctx.reply(render_template("manga_list.html", ctx=ctx, title=category.capitalize(),
                                      manga_categories=manga, pagination=pagination))
+
+
+@bp.route("/m/<int:manga>")
+def view(manga):
+    ctx = Context()
+    manga = Manga.from_id(manga)
+    if manga is None:
+        mflash("<b>Not Found.</b> The requested manga wasn't found.", "danger")
+        return ctx.reply(redirect(url_for("home.index")))
+    user = User.from_id(manga.uploader)
+    return ctx.reply(render_template("manga.html", ctx=ctx, m=manga, u=user,
+                                     state=state_name(manga.state),
+                                     d_created=None, d_updated=None, d_sourced=None))
+
+
+@bp.route("/m/<int:manga>/<string:method>")
+@bp.route("/m/<int:manga>/<string:method>/<int:page>")
+@bp.route("/m/<int:manga>/<string:method>/<string:filetype>")
+def reader_dispatch(manga, method, page=1, filetype=None):
+    ctx = Context()
+    methods = ("r", "cr", "ir", "r-s", "ir-s", "dl", "dl-s")
+    manga = Manga.from_id(manga)
+    if manga is None:
+        mflash("<b>Not found.</b> The requested manga wasn't found.", "danger")
+        return ctx.reply(redirect(url_for("home.index")))
+    # Check if method is supported
+    if method not in methods:
+        mflash("<b>Unknown method.</b> Viewing method wasn't found.", "danger")
+        return ctx.reply(redirect(url_for("manga.view", manga=manga.id)))
+    # Check if the request is a download request
+    if method in ("dl", "dl-s"):
+        return download_dispatch(ctx, manga, method, filetype)
+    # Check if we need to fetch from source instead of proxies
+    source = False
+    if method in ("r-s", "ir-s"):
+        source = True
+
+    if page not in [p[0] for p in manga.pages]:
+        mflash("<b>Not found.</b> Page not found.", "danger")
+        return ctx.reply(redirect(url_for("manga.view", manga=manga.id)))
+
+    meta = _gen_viewer_metadata(manga, method, page)
+    if method in ("ir", "ir-s"):
+        images = [_retrieve_image(p, source) for p in manga.pages]
+        return ctx.reply(render_template("manga_reader_inf.html", ctx=ctx, m=manga, images=images, **meta))
+
+    # Run precache
+    # TODO: Precache with threads
+    if method == "cr":
+        [_retrieve_image(p) for p in manga.pages]
+        return ctx.reply(redirect(url_for("manga.reader_dispatch", manga=manga.id, method="r")))
+    image = _retrieve_image(manga.pages[page - 1], source)
+    return ctx.reply(render_template("manga_reader.html", ctx=ctx, m=manga, image=image, **meta))
+
+
+def download_dispatch(ctx, manga, method, filetype):
+    return ctx.reply("Not Implemented Yet")
+
+
+def _retrieve_image(page, from_source=False):
+    if from_source:
+        return page[1]
+    else:
+        return get_url(page[2], page[1])
+
+
+def _gen_viewer_metadata(manga, method, page):
+    return {
+        "a_prev": f"/m/{manga.id}/{method}/{page - 1}" if page > 1 else "#",
+        "a_next": f"/m/{manga.id}/{method}/{page + 1}" if page < len(manga.pages) else "#",
+        "a_back": f"/m/{manga.id}",
+        "pb_current": page,
+        "pb_total": len(manga.pages),
+        "pb_pct": round((page / len(manga.pages)) * 100),
+        "s_text": _inv_str(method),
+        "s_url": f"/m/{manga.id}/{_inv(method)}/{page}" if page > 1 else f"/m/{manga.id}/{_inv(method)}"
+    }
+
+
+def _inv(method):
+    inverse = {
+        "r": "r-s",
+        "r-s": "r",
+        "ir": "ir-s",
+        "ir-s": "ir"
+    }
+    return inverse[method]
+
+
+def _inv_str(method):
+    inverse = {
+        "r": "Source Reader",
+        "r-s": "Proxied Reader",
+        "ir": "Source InfiniteScroll™",
+        "ir-s": "Proxied InfiniteScroll™"
+    }
+    return inverse[method]
