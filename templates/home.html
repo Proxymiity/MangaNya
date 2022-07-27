@@ -19,7 +19,7 @@
                                 {% for item in category['items'] %}
                                     <div class="col-xl-3" style="margin-bottom: 8px;">
                                         <a href="/m/{{ item.id }}" style="text-decoration: none; color: inherit;">
-                                            <img class="img-fluid" src="{{ item.cover }}" />
+                                            <img class="img-fluid" src="{{ item.cover }}" referrerpolicy="no-referrer"/>
                                             <h4 style="margin-bottom: 0px;">{{ item.title }}</h4>
                                             <p>{{ item.id }} | {{ item.language }}</p>
                                         </a>
@@ -48,7 +48,7 @@
                                 {% for item in category['items'] %}
                                     <div class="col-xl-4" style="margin-bottom: 8px;">
                                         <a href="/v/{{ item.id }}" style="text-decoration: none; color: inherit;">
-                                            <img class="img-fluid" src="{{ item.cover }}" />
+                                            <img class="img-fluid" src="{{ item.cover }}" referrerpolicy="no-referrer"/>
                                             <h4 style="margin-bottom: 0px;">{{ item.title }}</h4>
                                             <p>{{ item.id }} | {{ item.language }}</p>
                                         </a>
