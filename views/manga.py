@@ -6,6 +6,7 @@ from objects.manga import state_name
 from utils.auth import Context
 from utils.web import gen_paginate_data, mflash
 from utils.proxy import get_url
+from utils import tasks
 
 bp = Blueprint("manga", __name__)
 
@@ -65,6 +66,10 @@ def reader_dispatch(manga, method, page=1, filetype=None):
     # Check if the request is a download request
     if method in ("dl", "dl-s"):
         return download_dispatch(ctx, manga, method, filetype)
+    # Run precache
+    if method == "cr":
+        tasks.basic_multi_threaded(_retrieve_image, [((p,), None) for p in manga.pages])
+        return ctx.reply(redirect(url_for("manga.reader_dispatch", manga=manga.id, method="r")))
     # Check if we need to fetch from source instead of proxies
     source = False
     if method in ("r-s", "ir-s"):
@@ -76,14 +81,14 @@ def reader_dispatch(manga, method, page=1, filetype=None):
 
     meta = _gen_viewer_metadata(manga, method, page)
     if method in ("ir", "ir-s"):
-        images = [_retrieve_image(p, source) for p in manga.pages]
+        if source:
+            images = [_retrieve_image(p, source) for p in manga.pages]
+        else:
+            results = {}
+            tasks.basic_multi_threaded(_retrieve_image, [((p,), None) for p in manga.pages], results)
+            images = [x[1] for x in sorted(results.items())]
         return ctx.reply(render_template("manga_reader_inf.html", ctx=ctx, m=manga, images=images, **meta))
 
-    # Run precache
-    # TODO: Precache with threads
-    if method == "cr":
-        [_retrieve_image(p) for p in manga.pages]
-        return ctx.reply(redirect(url_for("manga.reader_dispatch", manga=manga.id, method="r")))
     image = _retrieve_image(manga.pages[page - 1], source)
     return ctx.reply(render_template("manga_reader.html", ctx=ctx, m=manga, image=image, **meta))
 
@@ -92,9 +97,11 @@ def download_dispatch(ctx, manga, method, filetype):
     return ctx.reply("Not Implemented Yet")
 
 
-def _retrieve_image(page, from_source=False):
+def _retrieve_image(page, from_source=False, task_data=None):
     if from_source:
         return page[1]
+    elif task_data is not None:  # "return" for threads
+        task_data[page[0]] = get_url(page[2], page[1])
     else:
         return get_url(page[2], page[1])
 
