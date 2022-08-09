@@ -61,3 +61,9 @@ def gen_paginate_data(current, pages, base_path, margin=2,
         else:
             data.append(("»", "#", "disabled"))
     return data
+
+
+def fmt_int(n, length):
+    tz = length - len(str(n))
+    z = ''.join(['0' for _ in range(tz)])
+    return f"{z}{n}"
