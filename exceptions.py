@@ -49,3 +49,11 @@ class FieldValidationError(AuthException):
 
 class UserStateError(AuthException):
     pass
+
+
+class FileException(MNException):
+    pass
+
+
+class TransformationError(FileException):
+    pass
