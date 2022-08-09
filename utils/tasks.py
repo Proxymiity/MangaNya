@@ -1,6 +1,8 @@
 import threading
 from uuid import uuid4
 
+from flask import url_for, redirect
+
 from pxyTools import JSONDict
 from pathlib import Path
 
@@ -25,7 +27,6 @@ def basic_multi_threaded(func, args, task_data=None):
         k = k or {}
         if task_data is not None:
             k["task_data"] = task_data
-        print(k)
         threads.append(threading.Thread(target=func, args=a, kwargs=k))
     for t in threads:
         t.start()
@@ -33,26 +34,31 @@ def basic_multi_threaded(func, args, task_data=None):
         t.join()
 
 
-def task_single_threaded(func, args, data=None, task_id=None):
+def task_single_threaded(func, args, data=None, task_id=None, keep=True):
     task_id = task_id or str(uuid4())
-    t = threading.Thread(target=_task_watcher, args=(task_id, data, basic_single_threaded, func, args))
+    t = threading.Thread(target=_task_watcher, args=(task_id, data, basic_single_threaded, func, args, keep))
     t.start()
     return task_id
 
 
-def task_multi_threaded(func, args, data=None, task_id=None):
+def task_multi_threaded(func, args, data=None, task_id=None, keep=True):
     task_id = task_id or str(uuid4())
-    t = threading.Thread(target=_task_watcher, args=(task_id, data, basic_multi_threaded, func, args))
+    t = threading.Thread(target=_task_watcher, args=(task_id, data, basic_multi_threaded, func, args, keep))
     t.start()
     return task_id
 
 
-def _task_watcher(task, tdata, tfunc, func, args):
+def _task_watcher(task, tdata, tfunc, func, args, keep):
     task_data = JSONDict(f"tmp/{task}.job.json", data=tdata)
+    task_data["_id"] = task
     set_task(task, False)
-    tfunc(func, args, task_data)
     task_data.save()
-    set_task(task, True)
+    tfunc(func, args, task_data)
+    if keep:
+        task_data.save()
+        set_task(task, True)
+    else:
+        set_task(task, None)
 
 
 def get_task(task):
@@ -70,3 +76,27 @@ def set_task(task, state):
     else:
         jobs[task] = state
     jobs.save()
+
+
+def create_task_meta(endpoint=None, endpoint_kwargs=None, data=None, kind=None, progress=None, info=None):
+    if data is None:
+        data = {}
+    data["_endpoint"] = endpoint
+    data["_endpoint_kwargs"] = endpoint_kwargs or {}
+    data["_kind"] = kind
+    data["_progress"] = progress or "No progress info available"
+    data["_info"] = info
+    return data
+
+
+def update_task_meta(task_data, endpoint=None, endpoint_kwargs=None, kind=None, progress=None, info=None):
+    task_data["_endpoint"] = endpoint or task_data["_endpoint"]
+    task_data["_endpoint_kwargs"] = endpoint_kwargs or task_data["_endpoint_kwargs"]
+    task_data["_kind"] = kind or task_data["_kind"]
+    task_data["_progress"] = progress or task_data["_progress"]
+    task_data["_info"] = info or task_data["_info"]
+    task_data.save()
+
+
+def client_side_wait(task):
+    return redirect(url_for("tasks.wait", task=task))
