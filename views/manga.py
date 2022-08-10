@@ -11,7 +11,7 @@ from shutil import rmtree
 from objects import Manga, MangaType, User
 from objects.manga import state_name
 from utils.auth import Context
-from utils.web import gen_paginate_data, mflash, fmt_int
+from utils.web import gen_paginate_data, mflash, fmt_int, time_ago_past
 from utils.proxy import get_url
 from utils import tasks
 from utils.files import make_pdf, make_zip
@@ -56,7 +56,9 @@ def view(manga):
     user = User.from_id(manga.uploader)
     return ctx.reply(render_template("manga.html", ctx=ctx, m=manga, u=user,
                                      state=state_name(manga.state),
-                                     d_created=None, d_updated=None, d_sourced=None))
+                                     d_created=time_ago_past(manga.created_at),
+                                     d_updated=time_ago_past(manga.updated_at),
+                                     d_sourced=time_ago_past(manga.source_created_at or manga.created_at)))
 
 
 @bp.route("/m/<int:manga>/<string:method>")
