@@ -127,7 +127,7 @@ def init():
                  "on update cascade on delete cascade, "
                  "source_id text not null, "
                  "source_name text not null, "
-                 "source_date date "
+                 "source_date timestamp "
                  "); "))
 
     dbc.execute(("create unique index mg_associations_source_uindex "
