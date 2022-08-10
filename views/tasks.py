@@ -15,7 +15,7 @@ bp = Blueprint("tasks", __name__)
 
 @bp.route("/tasks/wait/<string:task>", methods=["GET"])
 def wait(task):
-    ctx = Context()
+    ctx = Context(extend=False)
 
     t = tasks.get_task(task)
     if t[0] is True:  # task completed

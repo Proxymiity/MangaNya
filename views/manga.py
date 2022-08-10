@@ -125,7 +125,7 @@ def download_dispatch(ctx, manga, method, filetype):
 
 @bp.route("/manga/download/<string:task>")
 def download_task(task):
-    ctx = Context()
+    ctx = Context(extend=False)
     task_data = tasks.get_task(task)
     if not task_data[0]:  # No task found with that ID
         mflash("<b>Task not found.</b> No tasks were found with this ID.", "danger")
@@ -154,7 +154,7 @@ def download_task(task):
 
 @bp.route("/manga/download/<string:task>/file")
 def download_task_file(task):
-    ctx = Context()
+    ctx = Context(extend=False)
     task_data = tasks.get_task(task)
     if not task_data[0] or not task_data[1].get("_kind") or not task_data[1].get("success"):
         mflash("<b>Task not found.</b> It probably expired, did not succeed, or did not even exist.", "danger")
